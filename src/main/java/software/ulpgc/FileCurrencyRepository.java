@@ -1,21 +1,25 @@
 package software.ulpgc;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
 public class FileCurrencyRepository implements CurrencyRepository {
-    private final File sourceFile;
+    private final String resourcePath;
 
-    public FileCurrencyRepository(File sourceFile) {
-        this.sourceFile = sourceFile;
+    public FileCurrencyRepository(String resourcePath) {
+        this.resourcePath = resourcePath;
     }
 
     @Override
     public List<Currency> fetchAll() {
-        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(sourceFile))) {
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(resourcePath);
+             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream))) {
             return parse(bufferedReader);
-        } catch (IOException e) {
+        } catch (IOException | NullPointerException e) {
             throw new RuntimeException("Failed to load currency data", e);
         }
     }
